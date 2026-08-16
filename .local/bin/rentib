@@ -29,8 +29,7 @@ brightness() {
     echo "$bri" | tee $dev/brightness
     bri="$(( bri * 100 / max ))"
 
-    # TODO: xrdb was dropped, so somehing else must be used here
-    # bar_color="$(xrdb -query | grep 'color1:' | awk '{print $2}')"
+    bar_color="$(awk 'NR==2 {sub(/^0x/, "#", $3); print $3}' $XDG_CONFIG_HOME/dwl/config)"
     notify-send \
         -t 1000 \
         -h string:x-dunst-stack-tag:notify_brightness \
