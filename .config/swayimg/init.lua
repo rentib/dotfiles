@@ -135,11 +135,11 @@ swayimg.viewer.on_key("l", function()
     swayimg.viewer.set_abs_position(pos.x - 20, pos.y)
 end)
 swayimg.viewer.on_key("Shift+j", function()
-    scale = swayimg.viewer.get_scale()
+    scale = swayimg.viewer.scale
     swayimg.viewer.set_abs_scale(scale * (1 - 0.05))
 end)
 swayimg.viewer.on_key("Shift+k", function()
-    scale = swayimg.viewer.get_scale()
+    scale = swayimg.viewer.scale
     swayimg.viewer.set_abs_scale(scale * (1 + 0.05))
 end)
 swayimg.viewer.on_key("b", function()
