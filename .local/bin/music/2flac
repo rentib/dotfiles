@@ -1,0 +1,20 @@
+#!/bin/sh
+
+die() {
+    echo "$@" >&2
+    exit 1
+}
+
+input="$1"
+ext="${input##*.}"
+flac="${input%.*}.flac"
+
+[ -f "$input" ] || die "Usage: $(basename "$0") <input file>"
+[ -f "$flac" ] && die "Output file already exists: $flac"
+
+case "$ext" in
+    ape)     ffmpeg -i "$ape" -compression_level 12 "$flac" ;;
+    dsf|dff) ffmpeg -i "$input" -c:a flac -sample_fmt s16 -ar 44100 -compression_level 12 "$flac" ;;
+    wav)     ffmpeg -i "$input" -af aformat=s16:44100 -compression_level 12 "$flac" ;;
+    *)       die "Unsupported file type "$ext"" ;;
+esac
