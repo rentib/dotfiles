@@ -1,0 +1,94 @@
+#!/bin/sh
+#
+# This script uses typst to generate a nicely formatted poem pdf from a common
+# text file. The text file is expected to be split into lines and paragraphs,
+# as intended by the author of the piece.
+
+set -euo pipefail
+
+TITLE=""
+
+die() {
+    echo "$@" >&2
+    exit 1
+}
+
+usage() {
+    echo "usage: $(basename $0) [-t TITLE] <file>"
+    exit 0
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -h | --help)
+        usage
+        ;;
+    -t | --title)
+        TITLE="$2"
+        shift 2
+        ;;
+    *)
+        [[ -z "${FILE:-}" ]] || die "error: unexpected argument '$1'"
+        FILE="$1"
+        shift
+        ;;
+    esac
+done
+
+[[ -z "${FILE:-}" ]] && die "error: missing input file argument"
+[[ ! -f "$FILE" ]] && die "error: file '$FILE' not found"
+
+TEMPLATE=$(
+    cat <<'EOF'
+#set page(
+  paper: "iso-b5",
+  margin: (
+    top: 1.5cm,
+    bottom: 2.2cm,
+    inside: 1cm,
+    outside: 2cm,
+  ),
+  binding: left,
+)
+
+#set text(
+  font: "AntPoltExpd",
+  lang: "pl",
+  size: 12pt,
+)
+
+#let poem(title, content) = {
+  show heading: it => block[
+    #text(it.body)
+  ]
+
+  align(center, heading(
+    level: 1,
+    outlined: true,
+  )[
+    #text(size: 16pt)[#title]
+  ])
+  v(1em)
+
+  align(center, block(align(left, content)))
+  pagebreak(weak: true)
+}
+
+#set par(
+  spacing: 2em,
+)
+EOF
+)
+
+POEM_BODY=$(sed 's/$/ \\/' "$FILE")
+OUTPUT_PDF="$(basename "${FILE%.*}").pdf"
+
+{
+    echo "$TEMPLATE"
+    echo ""
+    echo "#poem(\"$TITLE\")["
+    echo "$POEM_BODY"
+    echo "]"
+} | typst compile - "$OUTPUT_PDF"
+
+echo "Successfully generated $OUTPUT_PDF"
