@@ -23,6 +23,7 @@ plugins:
 directory: ~/music/
 ignore_hidden: yes
 original_date: yes
+per_disc_numbering: yes
 import:
   resume: ask
   incremental: yes
@@ -30,6 +31,7 @@ import:
   languages: [pl, en]
 match:
   preferred:
+    countries: ['PL', 'US', 'GB|UK']
     original_year: yes
 
 autobpm:
@@ -44,9 +46,15 @@ fetchart:
 
 lyrics:
   auto: no
+  auto_ignore:
+    genres: Romantic, Classical, Instrumental
+    titles: Instrumental
   dist_thresh: 0.11
   fallback: ''
-  sources: [lrclib, tekstowo, genius]
+  lrcmux:
+      url: https://api.lrcmux.dev
+      sources: [lrclib, ytmusic, genius]
+  sources: [lrcmux, lrclib]
   synced: yes
 
 musicbrainz:
@@ -57,6 +65,10 @@ musicbrainz:
     discogs: yes
     spotify: yes
 
+replaygain:
+  auto: no
+  backend: ffmpeg
+
 smartplaylist:
   auto: yes
   relative_to: ~/music                  # mpd music directory
@@ -65,10 +77,6 @@ smartplaylist:
   playlists:
     - name: all.m3u
       query: ''
-
-replaygain:
-  auto: no
-  backend: ffmpeg
 
 spotify:
   data_source_mismatch_penalty: 0.3
