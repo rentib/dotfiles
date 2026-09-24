@@ -1,6 +1,6 @@
 #!/bin/sh
 
-URL_SEARCH="https://www.youtube.com/results?search_query="
+URL_SEARCH="https://www.youtube.com/results"
 URL_WATCH="https://www.youtube.com/watch?v="
 
 CACHE_SEPARATOR="#####"
@@ -105,13 +105,13 @@ while true; do
     -n|--number) shift; NUMBER_OF_RESULTS="$1"; shift ;;
     -p|--play) shift; play "$1"; exit 0 ;;
     -*) echo "yt: error: unknown option: $1" >&2; exit 1 ;;
-    *) QUERY=$(echo "$@" | sed 's/ /+/g'); break ;;
+    *) QUERY="$*"; break ;;
   esac
 done
 
 [ -z "$QUERY" ] && echo "yt: error: no query" >&2 && exit 1
 
-IDS=$(curl -s "$URL_SEARCH$QUERY" |\
+IDS=$(curl --silent --get --data-urlencode "search_query=$QUERY" "$URL_SEARCH" |\
   grep -Eo "watch\?v=.{11}" |\
   uniq |\
   sed "$NUMBER_OF_RESULTS"q |\
